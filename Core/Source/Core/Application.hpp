@@ -1,0 +1,73 @@
+#pragma once
+
+#include <glm/glm.hpp>
+
+#include "Layer.hpp"
+#include "Window.hpp"
+#include "Event.hpp"
+
+#include <vector>
+#include <memory>
+
+
+
+namespace Core
+{
+    struct ApplicationSpecification
+    {
+        std::string Name = "App";
+        WindowSpecification WindowSpec;
+    };
+
+
+    class Application
+    {
+    public:
+        Application(const ApplicationSpecification& appSpec = ApplicationSpecification());
+        ~Application();
+        
+        void Run();
+        void Stop();
+        
+        void RaiseEvent(Event& event);
+
+        template<typename TLayer>
+        requires(std::is_base_of_v<Layer, TLayer>)
+        void PushLayer()
+        {
+            m_layerStack.push_back(std::make_unique<TLayer>());
+        }
+        
+
+        template<typename TLayer>
+        requires(std::is_base_of_v<Layer, TLayer>)
+        TLayer* GetLayer()
+        {
+            for (const auto& layer : m_layerStack)
+            {
+                if (auto castedLayer = dynamic_cast<TLayer*>(layer.get()))
+                    return castedLayer;
+                
+                return nullptr;
+            }
+        }
+
+
+        glm::vec2 GetFrameBufferSize() const;
+
+        std::shared_ptr<Window> GetWindow() const;
+
+        static Application& Get();
+        static float GetTime();
+
+        
+    private:
+        ApplicationSpecification m_specification;
+
+        std::shared_ptr<Window> m_window;
+        bool m_isRunning = false;
+
+        std::vector<std::unique_ptr<Layer>> m_layerStack;
+        friend class Layer;
+    };
+}
