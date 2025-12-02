@@ -7,13 +7,27 @@ layout(location = 2) uniform dvec2 center;
 layout(location = 3) uniform double zoom;
 layout(location = 4) uniform sampler1D palette;
 
-int mandelbrot(dvec2 c)
-{
-    dvec2 z = dvec2(0.0, 0.0);
-    const int MAX_ITER = 500;
+uniform int u_maxIterations;
 
-    for (int i = 0; i < MAX_ITER; i++)
+#define ITER_LIMIT 15000
+
+
+int dynamicMaxIter()
+{
+    // scale iterations as you zoom
+    float factor = max(log(float(zoom)), 0.0);
+    return int(float(u_maxIterations) * (1.0 + factor));
+}
+
+
+int mandelbrot(dvec2 c, int maxIter)
+{
+    dvec2 z = dvec2(0.0);
+    int i;
+
+    for (i = 0; i < maxIter; i++)
     {
+        // z = z^2 + c  (double precision)
         double x = z.x * z.x - z.y * z.y + c.x;
         double y = 2.0 * z.x * z.y + c.y;
 
@@ -21,34 +35,28 @@ int mandelbrot(dvec2 c)
         z.y = y;
 
         if (z.x * z.x + z.y * z.y > 4.0)
-            return i;
+            break;
     }
-
-    return MAX_ITER;
+    return i;
 }
+
 
 void main()
 {
-    // Convert pixel coordinates to world coordinates
     vec2 uv = (gl_FragCoord.xy / iResolution) * 2.0 - 1.0;
     uv.x *= iResolution.x / iResolution.y;
 
     dvec2 world = center + dvec2(uv) * zoom;
 
-    // Compute iteration count
-    int iter = mandelbrot(world);
+    int maxI = dynamicMaxIter();
+    int iter = mandelbrot(world, maxI);
 
-    // Normalize for palette lookup
-    const int MAX_ITER = 500;
-    float t = float(iter) / float(MAX_ITER);
+    float t = float(iter) / float(maxI);
 
-    vec3 color;
+    vec3 color = texture(palette, t).rgb;
 
-    if (iter == MAX_ITER)
+    if (iter == maxI)
         color = vec3(0.0);
-    else
-        color = texture(palette, t).rgb;
-    
 
     fragColor = vec4(color, 1.0);
 }
