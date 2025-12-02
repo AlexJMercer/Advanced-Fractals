@@ -3,7 +3,7 @@
 #include "FractalLayer.hpp"
 
 
-int main() 
+int main(int argc, char* argv[]) 
 {
     Core::ApplicationSpecification appSpec;
     appSpec.Name = "Fractals Application";
@@ -12,6 +12,6 @@ int main()
     
     
     Core::Application appInstance(appSpec);
-    appInstance.PushLayer<FractalLayer>();
+    appInstance.PushLayer<FractalLayer>(argv[1]);
     appInstance.Run();
 }

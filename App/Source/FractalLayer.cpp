@@ -4,18 +4,20 @@
 #include <print>
 
 
-FractalLayer::FractalLayer()
+FractalLayer::FractalLayer(const char* path) :
+    m_FragmentShaderPath(path)
 {
     m_shader = Renderer::CreateGraphicsShader(
         "App/Data/Fullscreen.vert.glsl", 
-        // "App/Data/Mandelbrot.frag.glsl"
-        "App/Data/MandelbrotDouble.frag.glsl"
+        // "App/Data/MandelbrotDouble.frag.glsl"
+        m_FragmentShaderPath 
     );
 
     m_loc_resolution = glGetUniformLocation(m_shader, "iResolution");
     m_loc_center     = glGetUniformLocation(m_shader, "center");
     m_loc_zoom       = glGetUniformLocation(m_shader, "zoom");
     m_loc_palette    = glGetUniformLocation(m_shader, "palette");
+    m_loc_iterations = glGetUniformLocation(m_shader, "u_maxIterations");
 
     glCreateVertexArrays(1, &m_vertexArray);
     glCreateBuffers(1, &m_vertexBuffer);
@@ -100,14 +102,15 @@ void FractalLayer::onRender()
     glUniform2f(m_loc_resolution, frameBufferSize.x, frameBufferSize.y);
     glUniform1d(m_loc_zoom, m_zoom);
     glUniform2d(m_loc_center, m_center.x, m_center.y);
-
-#else
+    
+    #else
     glUniform2f(m_loc_resolution, frameBufferSize.x, frameBufferSize.y);
     glUniform1f(m_loc_zoom, m_zoom);
     glUniform2f(m_loc_center, m_center.x, m_center.y);
 
 #endif
 
+    glUniform1i(m_loc_iterations, 1000);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_1D, m_colorTexture);
 
@@ -136,21 +139,21 @@ bool FractalLayer::OnMouseScrollEvent(Core::MouseScrolledEvent& event)
     glm::vec2 windowSize = Core::Application::Get().GetFrameBufferSize();
 
     float yOffset = (float)event.GetYOffset();
-    float zoomSpeed = 0.1f;
+    double zoomSpeed = 0.1;
 
-    float aspect = windowSize.x / windowSize.y;
+    double aspect = (double)windowSize.x / (double)windowSize.y;
 
-    glm::vec2 uv;
-    uv.x =  (mouse.x / windowSize.x) * 2.0f - 1.0f;
-    uv.y = -(mouse.y / windowSize.y) * 2.0f + 1.0f;
+    glm::dvec2 uv;
+    uv.x =  (mouse.x / windowSize.x) * 2.0 - 1.0;
+    uv.y = -(mouse.y / windowSize.y) * 2.0 + 1.0;
     uv.x *= aspect;
 
-    glm::vec2 mouseWorldBefore = m_center + uv * m_zoom;
+    glm::dvec2 mouseWorldBefore = m_center + uv * m_zoom;
 
-    m_zoom *= (1.0f - yOffset * zoomSpeed);
-    m_zoom = glm::max(m_zoom, 1e-12f);
+    m_zoom *= (1.0 - yOffset * zoomSpeed);
+    m_zoom = glm::max(m_zoom, 1e-20);
 
-    glm::vec2 mouseWorldAfter = m_center + uv * m_zoom;
+    glm::dvec2 mouseWorldAfter = m_center + uv * m_zoom;
     m_center += (mouseWorldBefore - mouseWorldAfter);
 
     return false;
