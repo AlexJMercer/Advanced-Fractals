@@ -1,7 +1,6 @@
 #include "Renderer.hpp"
 #include "stb_image.h"
 
-
 #include <iostream>
 
 

@@ -4,10 +4,14 @@
 
 
 set(SOURCES
+    vendor/stb/stb_image.h
+    vendor/stb/stb_image.cpp
     Source/Core/Renderer/Renderer.hpp
     Source/Core/Renderer/Renderer.cpp
     Source/Core/Renderer/Shader.hpp
     Source/Core/Renderer/Shader.cpp
+    Source/Core/ColorPalette.hpp
+    Source/Core/ColorPalette.cpp
     Source/Core/Application.hpp
     Source/Core/Application.cpp
     Source/Core/Window.hpp

@@ -8,13 +8,14 @@ FractalLayer::FractalLayer()
 {
     m_shader = Renderer::CreateGraphicsShader(
         "App/Data/Fullscreen.vert.glsl", 
-        "App/Data/Mandelbrot.frag.glsl"
+        // "App/Data/Mandelbrot.frag.glsl"
+        "App/Data/MandelbrotDouble.frag.glsl"
     );
 
-    m_loc_time       = glGetUniformLocation(m_shader, "iTime");
     m_loc_resolution = glGetUniformLocation(m_shader, "iResolution");
     m_loc_center     = glGetUniformLocation(m_shader, "center");
     m_loc_zoom       = glGetUniformLocation(m_shader, "zoom");
+    m_loc_palette    = glGetUniformLocation(m_shader, "palette");
 
     glCreateVertexArrays(1, &m_vertexArray);
     glCreateBuffers(1, &m_vertexBuffer);
@@ -46,6 +47,26 @@ FractalLayer::FractalLayer()
 	// Link attribute locations to binding index 0
 	glVertexArrayAttribBinding(m_vertexArray, 0, 0);
 	glVertexArrayAttribBinding(m_vertexArray, 1, 0);
+
+    m_palette.generateGradient();
+
+    glGenTextures(1, &m_colorTexture);
+    glBindTexture(GL_TEXTURE_1D, m_colorTexture);
+
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+
+    glTexImage1D(
+        GL_TEXTURE_1D,
+        0,
+        GL_RGB8,
+        Core::ColorPalette::PALETTE_SIZE,
+        0,
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        m_palette.getColors().data()
+    );
 }
 
 
@@ -60,7 +81,7 @@ FractalLayer::~FractalLayer()
 
 void FractalLayer::onEvent(Core::Event& event)
 {
-    std::println("{}", event.ToString());
+    // std::println("{}", event.ToString());
 
     Core::EventDispatcher dispatcher(event);
     dispatcher.Dispatch<Core::MouseScrolledEvent>([this](Core::MouseScrolledEvent& mouseEvent) {
@@ -72,13 +93,25 @@ void FractalLayer::onEvent(Core::Event& event)
 void FractalLayer::onRender()
 {
     glUseProgram(m_shader);
-
-    glUniform1f(m_loc_time, m_time);
     
     glm::vec2 frameBufferSize = Core::Application::Get().GetFrameBufferSize();
+    
+#ifdef _DOUBLE_PRECISION_
+    glUniform2f(m_loc_resolution, frameBufferSize.x, frameBufferSize.y);
+    glUniform1d(m_loc_zoom, m_zoom);
+    glUniform2d(m_loc_center, m_center.x, m_center.y);
+
+#else
     glUniform2f(m_loc_resolution, frameBufferSize.x, frameBufferSize.y);
     glUniform1f(m_loc_zoom, m_zoom);
     glUniform2f(m_loc_center, m_center.x, m_center.y);
+
+#endif
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_1D, m_colorTexture);
+
+    glUniform1i(m_loc_palette, 0);
     
     glViewport(0, 0, static_cast<GLsizei>(frameBufferSize.x), static_cast<GLsizei>(frameBufferSize.y));
 
@@ -99,12 +132,26 @@ void FractalLayer::onUpdate(float ts)
 
 bool FractalLayer::OnMouseScrollEvent(Core::MouseScrolledEvent& event)
 {
-    float yOffset = static_cast<float>(event.GetYOffset());
+    glm::vec2 mouse = Core::Application::Get().GetWindow()->GetMousePos();
+    glm::vec2 windowSize = Core::Application::Get().GetFrameBufferSize();
 
+    float yOffset = (float)event.GetYOffset();
     float zoomSpeed = 0.1f;
-    m_zoom *= (1.0f - yOffset * zoomSpeed);
 
+    float aspect = windowSize.x / windowSize.y;
+
+    glm::vec2 uv;
+    uv.x =  (mouse.x / windowSize.x) * 2.0f - 1.0f;
+    uv.y = -(mouse.y / windowSize.y) * 2.0f + 1.0f;
+    uv.x *= aspect;
+
+    glm::vec2 mouseWorldBefore = m_center + uv * m_zoom;
+
+    m_zoom *= (1.0f - yOffset * zoomSpeed);
     m_zoom = glm::max(m_zoom, 1e-12f);
+
+    glm::vec2 mouseWorldAfter = m_center + uv * m_zoom;
+    m_center += (mouseWorldBefore - mouseWorldAfter);
 
     return false;
 }

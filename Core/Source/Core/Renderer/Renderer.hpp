@@ -27,7 +27,7 @@ namespace Renderer
     Texture CreateTexture(int width, int height);
     Texture LoadTexture(const std::filesystem::path &path);
     FrameBuffer CreateFrameBufferWithTexture(const Texture texture);
+
     bool AttachTextureToFrameBuffer(FrameBuffer &frameBuffer, const Texture texture);
     void BlitFrameBufferToSwapchain(FrameBuffer& frameBuffer);
-
 }

@@ -1,4 +1,5 @@
 #include "Window.hpp"
+#include "CustomEvents.hpp"
 
 #include <glad/gl.h>
 #include <iostream>
@@ -54,6 +55,12 @@ namespace Core
         //     window.RaiseEvent(event);
         // });
 
+        glfwSetScrollCallback(m_handle, [](GLFWwindow* window, double xOffset, double yOffset){
+            Window &userWindow = *((Window*)glfwGetWindowUserPointer(window));
+            
+            MouseScrolledEvent event(xOffset, yOffset);
+            userWindow.RaiseEvent(event);
+        });
 
     }
 
