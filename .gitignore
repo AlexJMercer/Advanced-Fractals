@@ -1,2 +1,5 @@
 build/
+Core/vendor/imgui/
+Core/vendor/stb/
 .vscode/
+imgui.ini

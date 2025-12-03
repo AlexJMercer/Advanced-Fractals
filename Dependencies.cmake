@@ -8,18 +8,18 @@ include(FetchContent)
 # GLFW
 find_package(glfw3 3.4 QUIET)
 if (NOT glfw3_FOUND)
-FetchContent_Declare(
-            glfw3
-            DOWNLOAD_EXTRACT_TIMESTAMP OFF
-            URL https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.zip
-            )
-            FetchContent_GetProperties(glfw3)
-            if (NOT glfw3_POPULATED)
-            set(FETCHCONTENT_QUIET NO)
-            FetchContent_Populate(glfw3)
+    FetchContent_Declare(
+        glfw3
+        DOWNLOAD_EXTRACT_TIMESTAMP OFF
+        URL https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.zip
+    )
+    FetchContent_GetProperties(glfw3)
+    if (NOT glfw3_POPULATED)
+        set(FETCHCONTENT_QUIET NO)
+        FetchContent_Populate(glfw3)
             add_subdirectory(${glfw3_SOURCE_DIR} ${glfw3_BINARY_DIR})
-            endif()
-            endif()
+    endif()
+endif()
             
 
 
@@ -63,3 +63,35 @@ if (NOT glm_FOUND)
     endif()
 endif()
 set_target_properties(glm PROPERTIES FOLDER "Dependencies")
+
+
+
+# ImGui
+# find_package(imgui QUIET)
+# FetchContent_Declare(
+#     imgui
+#     DOWNLOAD_EXTRACT_TIMESTAMP OFF
+#     URL https://github.com/ocornut/imgui/archive/refs/tags/v1.92.5-docking.tar.gz
+# )
+# # FetchContent_MakeAvailable(imgui)
+# FetchContent_GetProperties(imgui)
+# if (NOT imgui_POPULATED)
+#     FetchContent_Populate(imgui)
+# endif()
+
+# add_library(imgui STATIC
+#     ${imgui_SOURCE_DIR}/imgui.cpp
+#     ${imgui_SOURCE_DIR}/imgui_demo.cpp
+#     ${imgui_SOURCE_DIR}/imgui_draw.cpp
+#     ${imgui_SOURCE_DIR}/imgui_tables.cpp
+#     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+# )
+
+# target_include_directories(imgui PUBLIC
+#     ${imgui_SOURCE_DIR}
+#     ${imgui_SOURCE_DIR}/backends
+#     ${glfw3_INCLUDE_DIR}
+# )
+
+
+# set_target_properties(imgui PROPERTIES FOLDER "Dependencies")

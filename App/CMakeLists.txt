@@ -7,6 +7,8 @@ set(SOURCES
     Source/Fractals2.cpp
     Source/FractalLayer.hpp
     Source/FractalLayer.cpp
+    Source/ControlLayer.hpp
+    Source/ControlLayer.cpp
 )
 
 
@@ -27,6 +29,7 @@ add_compile_definitions(
 target_link_libraries(App Core)
 
 target_include_directories(App PRIVATE Source)
+
 
 
 set_target_properties(App PROPERTIES
