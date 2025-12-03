@@ -1,5 +1,9 @@
 #include "Application.hpp"
 
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+
 #include <iostream>
 #include <assert.h>
 #include <ranges>
@@ -32,14 +36,23 @@ namespace Core
         m_window = std::make_shared<Window>(m_specification.WindowSpec);
         m_window->Create();
 
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::StyleColorsDark();
+
+        ImGui_ImplGlfw_InitForOpenGL(m_window->GetHandle(), true);
+        ImGui_ImplOpenGL3_Init("#version 130");
         // Renderer::Utils::InitOpenGLDebugMessageCallback();
     }
 
 
     Application::~Application()
     {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        
         m_window->Destroy();
-
         glfwTerminate();
 
         s_application = nullptr;
@@ -56,6 +69,10 @@ namespace Core
         {
             glfwPollEvents();
 
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
             if (m_window->ShouldClose())
             {
                 Stop();     
@@ -71,6 +88,9 @@ namespace Core
                 
             for (const std::unique_ptr<Layer>& layer : m_layerStack)
                 layer->onRender();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
             
             m_window->Update();
         }

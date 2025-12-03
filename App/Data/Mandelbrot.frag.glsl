@@ -7,12 +7,13 @@ layout(location = 2) uniform vec2  center;
 layout(location = 3) uniform float zoom;
 layout(location = 4) uniform sampler1D palette;
 
+uniform int u_maxIterations;
+
 int mandelbrot(vec2 c)
 {
     vec2 z = vec2(0.0);
-    const int MAX_ITER = 500;
 
-    for (int i = 0; i < MAX_ITER; i++)
+    for (int i = 0; i < u_maxIterations; i++)
     {
         float x = z.x * z.x - z.y * z.y + c.x;
         float y = 2.0 * z.x * z.y + c.y;
@@ -24,7 +25,7 @@ int mandelbrot(vec2 c)
             return i;
     }
 
-    return MAX_ITER;
+    return u_maxIterations;
 }
 
 void main()
@@ -34,16 +35,14 @@ void main()
 
     vec2 world = center + uv * zoom;
 
-    // Compute iteration count
-    const int MAX_ITER = 500;
     int iter = mandelbrot(world);
 
     // Normalize iteration count for palette lookup
-    float t = float(iter) / float(MAX_ITER);
+    float t = float(iter) / float(u_maxIterations);
 
     vec3 color;
 
-    if (iter == MAX_ITER)
+    if (iter == u_maxIterations)
         color = vec3(0.0);
     else
         color = texture(palette, t).rgb;

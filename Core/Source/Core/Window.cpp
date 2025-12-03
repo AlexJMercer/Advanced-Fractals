@@ -62,6 +62,27 @@ namespace Core
             userWindow.RaiseEvent(event);
         });
 
+        glfwSetKeyCallback(m_handle, [](GLFWwindow* window, int key, int scanCode, int action, int mods){
+            Window &userWindow = *((Window*)glfwGetWindowUserPointer(window));
+
+            switch (action)
+            {
+                case GLFW_PRESS:
+                case GLFW_REPEAT:
+                {
+                    KeyPressedEvent event(key, action == GLFW_REPEAT);
+                    userWindow.RaiseEvent(event);
+                    break;
+                }
+                case GLFW_RELEASE:
+                {
+                    KeyReleasedEvent event(key);
+                    userWindow.RaiseEvent(event);
+                    break;
+                }
+            }
+        });
+
     }
 
     

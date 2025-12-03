@@ -53,6 +53,40 @@ namespace Core
     };
 
 
+    class KeyPressedEvent : public KeyEvent
+    {
+    public:
+        KeyPressedEvent(int keyCode, bool isRepeat) :
+            KeyEvent(keyCode),
+            m_isRepeat(isRepeat)
+        {}
+
+        inline bool IsRepeat() const { return m_isRepeat; }
+
+        std::string ToString() const override
+		{
+			return std::format("KeyPressedEvent: {} (repeat={})", m_keyCode, m_isRepeat);
+		}
+
+        EVENT_CLASS_TYPE(KeyPressed);
+
+    private:
+        bool m_isRepeat;
+    };
+
+
+    
+    class KeyReleasedEvent : public KeyEvent
+    {
+    public:
+        KeyReleasedEvent(int keyCode) : 
+            KeyEvent(keyCode)
+        {}
+
+        EVENT_CLASS_TYPE(KeyReleased);
+    };
+
+
 
     //
     //  Mouse Events

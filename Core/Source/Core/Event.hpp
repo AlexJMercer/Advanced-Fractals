@@ -58,10 +58,8 @@ namespace Core
                 m_event.Handled = func(*(T*)&m_event);
                 return true;
             }
-            
             return false;
         }
-
 
     private:
         Event& m_event;

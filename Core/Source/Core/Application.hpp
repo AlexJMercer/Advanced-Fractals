@@ -48,8 +48,21 @@ namespace Core
                 if (auto castedLayer = dynamic_cast<TLayer*>(layer.get()))
                     return castedLayer;
                 
-                return nullptr;
             }
+            return nullptr;
+        }
+
+
+        template<typename TLayer>
+        void RemoveLayer()
+        {
+            m_layerStack.erase(
+                std::remove_if(m_layerStack.begin(), m_layerStack.end(),
+                    [](const std::unique_ptr<Layer>& layer){
+                        return dynamic_cast<TLayer*>(layer.get()) != nullptr;
+                    }),
+                    m_layerStack.end()
+            );
         }
 
 

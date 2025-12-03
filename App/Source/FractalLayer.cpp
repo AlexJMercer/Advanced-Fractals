@@ -1,7 +1,7 @@
 #include "FractalLayer.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
-#include <print>
+#include <iostream>
 
 
 FractalLayer::FractalLayer(const char* path) :
@@ -9,7 +9,6 @@ FractalLayer::FractalLayer(const char* path) :
 {
     m_shader = Renderer::CreateGraphicsShader(
         "App/Data/Fullscreen.vert.glsl", 
-        // "App/Data/MandelbrotDouble.frag.glsl"
         m_FragmentShaderPath 
     );
 
@@ -89,6 +88,12 @@ void FractalLayer::onEvent(Core::Event& event)
     dispatcher.Dispatch<Core::MouseScrolledEvent>([this](Core::MouseScrolledEvent& mouseEvent) {
         return OnMouseScrollEvent(mouseEvent);
     });
+
+    dispatcher.Dispatch<Core::KeyPressedEvent>([this](Core::KeyPressedEvent& keyEvent) {
+        // std::cout << keyEvent.ToString() << std::endl;
+        return OnKeyPressedEvent(keyEvent);
+    });
+
 }
 
 
@@ -103,14 +108,14 @@ void FractalLayer::onRender()
     glUniform1d(m_loc_zoom, m_zoom);
     glUniform2d(m_loc_center, m_center.x, m_center.y);
     
-    #else
+#else
     glUniform2f(m_loc_resolution, frameBufferSize.x, frameBufferSize.y);
     glUniform1f(m_loc_zoom, m_zoom);
     glUniform2f(m_loc_center, m_center.x, m_center.y);
 
 #endif
 
-    glUniform1i(m_loc_iterations, 1000);
+    glUniform1i(m_loc_iterations, m_iterations);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_1D, m_colorTexture);
 
@@ -155,6 +160,36 @@ bool FractalLayer::OnMouseScrollEvent(Core::MouseScrolledEvent& event)
 
     glm::dvec2 mouseWorldAfter = m_center + uv * m_zoom;
     m_center += (mouseWorldBefore - mouseWorldAfter);
+
+    return false;
+}
+
+
+bool FractalLayer::OnKeyPressedEvent(Core::KeyPressedEvent& event)
+{
+    if (event.IsRepeat())
+        return false;
+
+    switch (event.GetKeyCode())
+    {
+        case GLFW_KEY_ESCAPE:
+        {
+            Core::Application::Get().Stop();
+            break;
+        }
+
+        case GLFW_KEY_H:
+        {
+            Core::Application& app = Core::Application::Get();
+            
+            if (app.GetLayer<ControlLayer>())   // If Layer exists
+                app.RemoveLayer<ControlLayer>();
+            else
+                app.PushLayer<ControlLayer>();
+
+            return true;
+        }
+    }
 
     return false;
 }
