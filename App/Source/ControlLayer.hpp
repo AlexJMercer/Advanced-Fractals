@@ -11,7 +11,7 @@ class ControlLayer : public Core::Layer
 {
 public:
     ControlLayer();
-    virtual ~ControlLayer();
+    virtual ~ControlLayer() {}
 
     virtual void onUpdate(float ts) override {}
     virtual void onRender() override;

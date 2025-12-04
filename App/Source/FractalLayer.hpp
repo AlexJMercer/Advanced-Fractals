@@ -39,6 +39,8 @@ private:
 
     std::filesystem::path m_FragmentShaderPath;
     
+    void updatePaletteTexture();
+    
     bool OnMouseScrollEvent(Core::MouseScrolledEvent& event);
     bool OnKeyPressedEvent(Core::KeyPressedEvent& event);
     

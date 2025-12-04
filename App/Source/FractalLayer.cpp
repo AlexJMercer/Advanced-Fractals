@@ -103,19 +103,20 @@ void FractalLayer::onRender()
     
     glm::vec2 frameBufferSize = Core::Application::Get().GetFrameBufferSize();
     
-#ifdef _DOUBLE_PRECISION_
     glUniform2f(m_loc_resolution, frameBufferSize.x, frameBufferSize.y);
+
+#ifdef _DOUBLE_PRECISION_
     glUniform1d(m_loc_zoom, m_zoom);
     glUniform2d(m_loc_center, m_center.x, m_center.y);
     
 #else
-    glUniform2f(m_loc_resolution, frameBufferSize.x, frameBufferSize.y);
     glUniform1f(m_loc_zoom, m_zoom);
     glUniform2f(m_loc_center, m_center.x, m_center.y);
 
 #endif
 
     glUniform1i(m_loc_iterations, m_iterations);
+    
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_1D, m_colorTexture);
 
@@ -136,6 +137,22 @@ void FractalLayer::onUpdate(float ts)
 {
     m_time += ts;
 }
+
+
+void FractalLayer::updatePaletteTexture()
+{
+    glBindTexture(GL_TEXTURE_1D, m_colorTexture);
+    glTexSubImage1D(
+        GL_TEXTURE_1D,
+        0,
+        0,
+        Core::ColorPalette::PALETTE_SIZE,
+        GL_RGB,
+        GL_UNSIGNED_BYTE,
+        m_palette.getColors().data()
+    );
+}
+
 
 
 bool FractalLayer::OnMouseScrollEvent(Core::MouseScrolledEvent& event)

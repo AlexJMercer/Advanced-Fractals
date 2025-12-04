@@ -11,6 +11,9 @@ namespace Core
         m_distDark(0, 35),
         m_distBright(100, 255)
     {
+        m_startColor = { (uint8_t)m_distDark(m_rng), (uint8_t)m_distDark(m_rng), (uint8_t)m_distDark(m_rng) };
+        m_endColor = { (uint8_t)m_distBright(m_rng), (uint8_t)m_distBright(m_rng), (uint8_t)m_distBright(m_rng) };
+
         m_colors.resize(PALETTE_SIZE);
         generateGradient();
     }
@@ -45,13 +48,10 @@ namespace Core
 
     void ColorPalette::generateGradient()
     {
-        pixel_t a = { (uint8_t)m_distDark(m_rng), (uint8_t)m_distDark(m_rng), (uint8_t)m_distDark(m_rng) };
-        pixel_t b = { (uint8_t)m_distBright(m_rng), (uint8_t)m_distBright(m_rng), (uint8_t)m_distBright(m_rng) };
-
         for (size_t i = 0; i < PALETTE_SIZE; i++) 
         {
             float t = float(i) / float(PALETTE_SIZE - 1);
-            m_colors[i] = linearInterpolation(a, b, t);
+            m_colors[i] = linearInterpolation(m_startColor, m_endColor, t);
         }
     }
 

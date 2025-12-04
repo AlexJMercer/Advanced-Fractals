@@ -1,8 +1,8 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <vector>
 #include <random>
-
 
 namespace Core
 {
@@ -20,6 +20,7 @@ namespace Core
         ColorPalette();
         ~ColorPalette() = default;
 
+        pixel_t m_startColor, m_endColor;
         static constexpr size_t PALETTE_SIZE = 256;
 
         void generateRandom();
