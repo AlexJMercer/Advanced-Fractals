@@ -9,12 +9,8 @@ layout(location = 4) uniform sampler1D palette;
 
 uniform int u_maxIterations;
 
-#define ITER_LIMIT 15000
-
-
 int dynamicMaxIter()
 {
-    // scale iterations as you zoom
     float factor = max(log(float(zoom)), 0.0);
     return int(float(u_maxIterations) * (1.0 + factor));
 }
