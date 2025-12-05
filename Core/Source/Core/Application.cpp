@@ -1,8 +1,5 @@
 #include "Application.hpp"
 
-#include <imgui.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
 
 #include <iostream>
 #include <assert.h>
@@ -114,8 +111,29 @@ namespace Core
     }
 
 
+
+    void Application::TakeScreenshot(const std::string &path)
+    {
+        glm::vec2 frameSize = s_application->GetFrameBufferSize();
+
+        std::vector<uint8_t> pixelArray(frameSize.x * frameSize.y * 3);
+
+        glReadBuffer(GL_FRONT);
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        glReadPixels(
+            0, 0, 
+            frameSize.x, frameSize.y,
+            GL_RGB, GL_UNSIGNED_BYTE,
+            pixelArray.data()
+        );
+
+        if (stbi_write_png(path.c_str(), frameSize.x, frameSize.y, 3, pixelArray.data(), frameSize.x * 3))
+            std::cout << "Image printed\n";
+    }
+
+
     glm::vec2 Application::GetFrameBufferSize() const
-	{
+    {
 		return m_window->GetFrameBufferSize();
 	}
 

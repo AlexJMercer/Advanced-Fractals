@@ -1,6 +1,12 @@
 #pragma once
 
+#include "stb_image_write.h"
+
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
+#include <glad/gl.h>
 
 #include "Layer.hpp"
 #include "Window.hpp"
@@ -65,6 +71,8 @@ namespace Core
             );
         }
 
+
+        void TakeScreenshot(const std::string& path);
 
         glm::vec2 GetFrameBufferSize() const;
 

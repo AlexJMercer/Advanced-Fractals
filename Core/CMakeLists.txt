@@ -6,6 +6,9 @@
 set(SOURCES
     vendor/stb/stb_image.h
     vendor/stb/stb_image.cpp
+    vendor/stb/stb_image_write.h
+    vendor/stb/stb_image_write.cpp
+
     vendor/imgui/backends/imgui_impl_glfw.h
     vendor/imgui/backends/imgui_impl_glfw.cpp
     vendor/imgui/backends/imgui_impl_opengl3.h

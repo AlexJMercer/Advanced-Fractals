@@ -1,5 +1,6 @@
 build/
 Core/vendor/imgui/
 Core/vendor/stb/
+Screenshots/
 .vscode/
 imgui.ini

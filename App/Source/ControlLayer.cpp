@@ -43,13 +43,13 @@ void ControlLayer::onRender()
     if (ImGui::Button("Reset Zoom"))
         m_fractalLayer->m_zoom = 0.5;
         
-    ImGui::Spacing();
+    ImGui::Dummy(ImVec2(0.0f, 20.0f));
     
     ImGui::SliderInt("Iterations", &m_fractalLayer->m_iterations, 5, 20000);
     if (ImGui::Button("Reset Iterations"))
     m_fractalLayer->m_iterations = 500;
     
-    ImGui::Spacing();
+    ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
     Core::pixel_t& start = m_fractalLayer->m_palette.m_startColor;
     Core::pixel_t& end = m_fractalLayer->m_palette.m_endColor;
@@ -60,7 +60,7 @@ void ControlLayer::onRender()
 
     updated |= ImGui::ColorPicker3("Start Color", stColor);
 
-    ImGui::Spacing();
+    ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
     updated |= ImGui::ColorPicker3("End Color", enColor);
 

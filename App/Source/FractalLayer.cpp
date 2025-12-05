@@ -82,8 +82,6 @@ FractalLayer::~FractalLayer()
 
 void FractalLayer::onEvent(Core::Event& event)
 {
-    // std::println("{}", event.ToString());
-
     Core::EventDispatcher dispatcher(event);
     dispatcher.Dispatch<Core::MouseScrolledEvent>([this](Core::MouseScrolledEvent& mouseEvent) {
         return OnMouseScrollEvent(mouseEvent);
@@ -192,7 +190,7 @@ bool FractalLayer::OnKeyPressedEvent(Core::KeyPressedEvent& event)
         case GLFW_KEY_ESCAPE:
         {
             Core::Application::Get().Stop();
-            break;
+            return true;
         }
 
         case GLFW_KEY_H:
@@ -203,6 +201,14 @@ bool FractalLayer::OnKeyPressedEvent(Core::KeyPressedEvent& event)
                 app.RemoveLayer<ControlLayer>();
             else
                 app.PushLayer<ControlLayer>();
+
+            return true;
+        }
+
+        case GLFW_KEY_P:
+        {
+            std::string fileName = "Screenshots\\screenshot_" + std::to_string((int)m_time) + ".png";
+            Core::Application::Get().TakeScreenshot(fileName);
 
             return true;
         }
